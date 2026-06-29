@@ -29,6 +29,9 @@ interface FormErrors {
   description?: string
 }
 
+const FRIENDLY_SUBMIT_ERROR =
+  'Не удалось отправить фидбек. Попробуй еще раз или проверь интернет.'
+
 export function FeedbackForm({ feedbackQuestion, onSubmit }: FeedbackFormProps) {
   const [type, setType] = useState<FeedbackType | ''>('')
   const [title, setTitle] = useState('')
@@ -90,7 +93,8 @@ export function FeedbackForm({ feedbackQuestion, onSubmit }: FeedbackFormProps) 
       setShowSuccess(true)
       window.setTimeout(() => setShowSuccess(false), 3500)
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Could not send feedback. Please try again.')
+      console.error('[FeedbackWall] feedback submit failed', err)
+      setSubmitError(FRIENDLY_SUBMIT_ERROR)
     } finally {
       setIsSubmitting(false)
     }

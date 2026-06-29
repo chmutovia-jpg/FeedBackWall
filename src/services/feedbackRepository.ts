@@ -11,7 +11,7 @@ import type {
 } from '../types'
 import { storage } from './storage'
 import type { PickedFile } from './storage'
-import { isSupabaseConfigured, supabase } from './supabaseClient'
+import { isSupabaseConfigured, supabase, supabaseProjectUrl } from './supabaseClient'
 import { generateOwnerToken, generatePublicSlug, sha256Hex } from '../utils/accessTokens'
 import { dataUrlToBlob } from '../utils/fileToDataUrl'
 import { generateId } from '../utils/ids'
@@ -20,6 +20,29 @@ export { isSupabaseConfigured }
 export type { PickedFile }
 
 const STORAGE_BUCKET = 'feedbackwall-screenshots'
+
+export function getFeedbackSubmitDiagnostics(attachmentsCount: number) {
+  const hasScreenshots = attachmentsCount > 0
+
+  if (!isSupabaseConfigured || !supabaseProjectUrl) {
+    return {
+      endpointUrl: 'localStorage',
+      method: 'local',
+      payloadType: hasScreenshots ? 'JSON + local data URLs' : 'JSON',
+      hasScreenshots,
+    }
+  }
+
+  return {
+    endpointUrl: `${supabaseProjectUrl}/rest/v1/feedback?select=*`,
+    method: 'POST',
+    payloadType: hasScreenshots ? 'JSON + Blob storage uploads' : 'JSON',
+    hasScreenshots,
+    storageEndpointUrl: hasScreenshots
+      ? `${supabaseProjectUrl}/storage/v1/object/${STORAGE_BUCKET}/feedback/:feedbackId/...`
+      : undefined,
+  }
+}
 
 export interface CreateProjectResult {
   project: Project

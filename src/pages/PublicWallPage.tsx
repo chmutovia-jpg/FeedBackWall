@@ -7,7 +7,11 @@ import { FeedbackCard } from '../components/FeedbackCard'
 import { FeedbackForm } from '../components/FeedbackForm'
 import { EmptyState } from '../components/EmptyState'
 import { AttachmentGrid } from '../components/AttachmentGrid'
-import { feedbackRepository, isSupabaseConfigured } from '../services/feedbackRepository'
+import {
+  feedbackRepository,
+  getFeedbackSubmitDiagnostics,
+  isSupabaseConfigured,
+} from '../services/feedbackRepository'
 import type { Feedback, Project } from '../types'
 import { DEMO_PUBLIC_SLUG } from '../data/demoData'
 
@@ -163,6 +167,11 @@ export function PublicWallPage() {
           feedbackQuestion={project.feedbackQuestion}
           onSubmit={async (input) => {
             if (!project) return
+            console.log('[FeedbackWall] submit feedback', {
+              ...getFeedbackSubmitDiagnostics(input.attachments.length),
+              projectId: project.id,
+              attachmentsCount: input.attachments.length,
+            })
             await feedbackRepository.createFeedback({ projectId: project.id, ...input })
             await refresh()
           }}
