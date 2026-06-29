@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.DS_Store
+npm-debug.log*
+coverage
+*.tsbuildinfo
+.claude/settings.local.json
